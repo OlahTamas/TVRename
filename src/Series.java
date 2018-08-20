@@ -49,23 +49,56 @@ public class Series {
                 }
             }
         }
-        this.seriesTitle = bestChoice;
+        this.seriesTitle = bestChoice.substring(0, 1).toUpperCase().concat(bestChoice.substring(1));
     }
 
     public String proposeFilename(int episodeIndex) {
         Episode episode = this.episodes.get(episodeIndex);
-        String result = this.seriesTitle.concat(" - ")
+        String extension = DirectoryParser.getFileExtension(episode.videoFilename);
+        return proposeFilename(episodeIndex, extension);
+    }
+
+    public String proposeVideoFilename(int episodeIndex) {
+        Episode episode = this.episodes.get(episodeIndex);
+        String extension = DirectoryParser.getFileExtension(episode.videoFilename);
+        return proposeFilename(episodeIndex, extension);
+    }
+
+    public String proposeSubtitleFilename(int episodeIndex) {
+        Episode episode = this.episodes.get(episodeIndex);
+        if (episode.subtitleFileName == null) {
+            return "";
+        }
+        String extension = DirectoryParser.getFileExtension(episode.subtitleFileName);
+        return proposeFilename(episodeIndex, extension);
+    }
+
+    public String proposeFilename(int episodeIndex, String extension) {
+        Episode episode = this.episodes.get(episodeIndex);
+        String result = this.seriesTitle
+                .replaceAll("-", "")
+                .replaceAll("\\s{2,}", "\\s")
+                .trim()
+                .replaceAll("\\s", "\\.")
+                .replaceAll("\\.{2,}", "\\.")
+                .trim()
+                .concat(".")
                 .concat(episode.episodeIdentifier.getStandardEpisodeIdentifierString())
                 .concat(".")
-                .concat(DirectoryParser.getFileExtension(episode.videoFilename));
+                .concat(extension);
 
         return result;
     }
 
-    public HashMap<String, String> getTableData() {
-        HashMap<String, String> result = new HashMap<String, String>();
+    public void setSeriesTitle(String seriesTitle) {
+        this.seriesTitle = seriesTitle;
+    }
+
+    public HashMap<String, String[]> getTableData() {
+        HashMap<String, String[]> result = new HashMap<String, String[]>();
         for (int i = 0; i < this.episodes.size(); i++) {
-            result.put(this.episodes.get(i).videoFilename, this.proposeFilename(i));
+            String[] data = {this.episodes.get(i).subtitleFileName, this.proposeVideoFilename(i), this.proposeSubtitleFilename(i)};
+            result.put(this.episodes.get(i).videoFilename, data);
         }
 
         return result;

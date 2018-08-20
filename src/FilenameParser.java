@@ -57,22 +57,21 @@ public class FilenameParser {
 
     private String getEpisodeFromEpisodeIdentifierString(String episodeIdentifierString) {
         String lowerCaseSubject = episodeIdentifierString.toLowerCase().replaceAll("(\\.|\\_)", "").trim();
-        String result = "0";
         if (lowerCaseSubject.indexOf('e') > -1) {
             int startIndex = lowerCaseSubject.indexOf('e');
-            result = lowerCaseSubject.substring(startIndex + 1);
+            return lowerCaseSubject.substring(startIndex + 1);
         }
         if (lowerCaseSubject.indexOf('x') > -1) {
             String[] pieces = lowerCaseSubject.split("x");
-            result = pieces[1];
+            return pieces[1];
         }
         if (lowerCaseSubject.length() == 4) {
-            result = lowerCaseSubject.substring(2);
+            return lowerCaseSubject.substring(2);
         }
         if (lowerCaseSubject.length() == 3) {
-            result = lowerCaseSubject.substring(1);
+            return lowerCaseSubject.substring(1);
         }
 
-        return result;
+        return "0";
     }
 }
