@@ -1,6 +1,4 @@
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 public class Series {
     String seriesTitle;
@@ -94,13 +92,27 @@ public class Series {
         this.seriesTitle = seriesTitle;
     }
 
-    public HashMap<String, String[]> getTableData() {
-        HashMap<String, String[]> result = new HashMap<String, String[]>();
+    public ArrayList<String[]> getTableData() {
+        ArrayList<String[]> result = new ArrayList<String[]>();
         for (int i = 0; i < this.episodes.size(); i++) {
-            String[] data = {this.episodes.get(i).subtitleFileName, this.proposeVideoFilename(i), this.proposeSubtitleFilename(i)};
-            result.put(this.episodes.get(i).videoFilename, data);
+            String[] data = {
+                    this.episodes.get(i).videoFilename,
+                    this.episodes.get(i).subtitleFileName,
+                    this.proposeVideoFilename(i),
+                    this.proposeSubtitleFilename(i)};
+            result.add(data);
         }
 
         return result;
+    }
+
+    public void sortEpisodesByEpisodeIdentifier() {
+        Collections.sort(this.episodes, new Comparator<Episode>() {
+            @Override
+            public int compare(Episode o1, Episode o2) {
+                int result = o1.episodeIdentifier.episode.compareToIgnoreCase(o2.episodeIdentifier.episode);
+                return result;
+            }
+        });
     }
 }

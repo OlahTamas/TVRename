@@ -2,6 +2,7 @@ import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.text.TableView;
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -87,14 +88,14 @@ public class MainForm extends JFrame{
         this.resultLabel.setText(label);
     }
 
-    public void setFileListTableContent(HashMap<String, String[]> content) {
+    public void setFileListTableContent(ArrayList<String[]> content) {
         FileTableModel tableModel = new FileTableModel(0, 4);
-        for (Map.Entry<String, String[]> entry: content.entrySet()) {
+        for (String[] entry: content) {
             Object[] rowObject = {
-                    entry.getKey(),
-                    entry.getValue()[0],
-                    entry.getValue()[1],
-                    entry.getValue()[2],
+                    entry[0],
+                    entry[1],
+                    entry[2],
+                    entry[3],
             };
             tableModel.addRow(rowObject);
         }

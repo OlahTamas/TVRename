@@ -44,6 +44,7 @@ public class Renamer {
         JButton button = (JButton) e.getSource();
         MainForm frame = (MainForm) SwingUtilities.getRoot(button);
         if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
+            setCurrentStatusDisplay("Loading directory");
             frame.setDirectoryLabel(chooser.getSelectedFile().toString());
             this.path = chooser.getSelectedFile().toString();
             DirectoryParser parser = new DirectoryParser(this.path);
@@ -52,11 +53,12 @@ public class Renamer {
             ((MainForm) this.frame).enableProceedButton();
             ((MainForm) this.frame).enableTitleButton();
             ((MainForm) this.frame).titleTextField.setText(this.series.seriesTitle);
-
+            setCurrentStatusDisplay("Directory loaded");
         }
     }
 
     public void proceedWithRenaming() {
+        setCurrentStatusDisplay("Processing files");
         for (int i = 0; i < this.series.episodes.size(); i++) {
             String pathSeparator = System.getProperty("file.separator");
             Episode episode = this.series.episodes.get(i);
@@ -70,7 +72,7 @@ public class Renamer {
                 subtitleFile.renameTo(new File(this.path.concat(pathSeparator).concat(newSubtitleName)));
             }
         }
-        ((MainForm) this.frame).setResultLabel("Operation completed");
+        setCurrentStatusDisplay("Operation completed");
 
     }
 
@@ -78,6 +80,10 @@ public class Renamer {
         String newTitle = ((MainForm) this.frame).titleTextField.getText();
         this.series.setSeriesTitle(newTitle);
         ((MainForm) this.frame).setFileListTableContent(this.series.getTableData());
+    }
+
+    public void setCurrentStatusDisplay(String statusText) {
+        ((MainForm) this.frame).setResultLabel(statusText);
     }
 
 }

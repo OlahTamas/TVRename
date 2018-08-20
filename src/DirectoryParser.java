@@ -44,6 +44,7 @@ public class DirectoryParser {
             result.addSubtitleFile(subtitleFile);
         }
         result.findSeriesTitle();
+        result.sortEpisodesByEpisodeIdentifier();
 
         return result;
     }
