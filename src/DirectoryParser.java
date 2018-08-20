@@ -1,27 +1,19 @@
 import javax.swing.*;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 
-public class DirectoryParser {
+public class DirectoryParser extends DirectoryParserBase {
     String path;
     ArrayList<String> videoFiles;
     ArrayList<String> subtitleFiles;
 
-    ArrayList<String> videoFileExtensions;
-    ArrayList<String> subtitleFileExtensions;
-
     public DirectoryParser(String path) {
         this.path = path;
-        this.videoFileExtensions = new ArrayList<String>();
-        this.videoFileExtensions.add("mkv");
-        this.videoFileExtensions.add("mp4");
-        this.videoFileExtensions.add("avi");
-        this.subtitleFileExtensions = new ArrayList<String>();
-        this.subtitleFileExtensions.add("srt");
-        this.subtitleFileExtensions.add("sub");
         this.videoFiles = new ArrayList<String>();
         this.subtitleFiles = new ArrayList<String>();
+        this.initLists();
     }
 
     public Series processFiles() {
@@ -47,20 +39,5 @@ public class DirectoryParser {
         result.sortEpisodesByEpisodeIdentifier();
 
         return result;
-    }
-
-    public static String getFileExtension(String filename) {
-        int i = filename.lastIndexOf('.');
-        return i > -1 ? filename.substring(i+1) : "";
-    }
-
-    private boolean isFileVideoFile(String filename) {
-        String extension = getFileExtension(filename);
-        return this.videoFileExtensions.contains(extension);
-    }
-
-    private boolean isFileSubtitleFile(String filename) {
-        String extension = getFileExtension(filename);
-        return this.subtitleFileExtensions.contains(extension);
     }
 }
