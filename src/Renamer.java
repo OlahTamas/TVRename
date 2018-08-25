@@ -2,10 +2,14 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.File;
-import java.io.IOException;
+import java.io.*;
+import java.lang.reflect.Array;
 import java.nio.file.Files;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
 public class Renamer {
     String path;
@@ -15,10 +19,12 @@ public class Renamer {
     Series series;
     ArrayList<String> filesToBeCopiedOrMoved;
     ArrayList<String> directoriesToBeDeleted;
+    ArrayList<String> renameLog;
 
     public Renamer() {
         this.filesToBeCopiedOrMoved = new ArrayList<String>();
         this.directoriesToBeDeleted = new ArrayList<String>();
+        this.renameLog = new ArrayList<String>();
         this.frame = new MainForm();
         ((MainForm) this.frame).button1.addActionListener(new ActionListener() {
             @Override
@@ -29,7 +35,13 @@ public class Renamer {
         ((MainForm) this.frame).proceedButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                proceedWithRenaming();
+                try {
+                    proceedWithRenaming();
+                } catch (FileNotFoundException e1) {
+                    e1.printStackTrace();
+                } catch (UnsupportedEncodingException e1) {
+                    e1.printStackTrace();
+                }
             }
         });
         ((MainForm) this.frame).titleUpdateButton.addActionListener(new ActionListener() {
@@ -92,6 +104,16 @@ public class Renamer {
                 searchDirectoriesWithoutVideofiles();
             }
         });
+        ((MainForm) this.frame).revertButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    undoRenameFromLogfile(e);
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
 
     }
 
@@ -103,7 +125,7 @@ public class Renamer {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Select a directory");
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setCurrentDirectory(new File("o:/sorozat/megnezve/sga_s4"));
+        //chooser.setCurrentDirectory(new File("o:/sorozat/megnezve/sga_s4"));
         JButton button = (JButton) e.getSource();
         MainForm frame = (MainForm) SwingUtilities.getRoot(button);
         if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
@@ -120,23 +142,52 @@ public class Renamer {
         }
     }
 
-    public void proceedWithRenaming() {
+    public void proceedWithRenaming() throws FileNotFoundException, UnsupportedEncodingException {
         setCurrentStatusDisplay("Processing files");
         for (int i = 0; i < this.series.episodes.size(); i++) {
             String pathSeparator = System.getProperty("file.separator");
             Episode episode = this.series.episodes.get(i);
             File videoFile = new File(this.path.concat(pathSeparator).concat(episode.videoFilename));
             String newName = this.series.proposeFilename(i);
-            videoFile.renameTo(new File(this.path.concat(pathSeparator).concat(newName)));
+            File newFile = new File(this.path.concat(pathSeparator).concat(newName));
+            videoFile.renameTo(newFile);
+            this.logRename(videoFile, newFile);
             if (episode.subtitleFileName != null) {
                 String subtitleExtension = DirectoryParser.getFileExtension(episode.subtitleFileName);
                 String newSubtitleName = this.series.proposeFilename(i, subtitleExtension);
                 File subtitleFile = new File(this.path.concat(pathSeparator).concat(episode.subtitleFileName));
-                subtitleFile.renameTo(new File(this.path.concat(pathSeparator).concat(newSubtitleName)));
+                File newSubtitleFile = new File(this.path.concat(pathSeparator).concat(newSubtitleName));
+                this.logRename(subtitleFile, newSubtitleFile);
+                subtitleFile.renameTo(newSubtitleFile);
             }
         }
+        this.saveRenameLog();
         setCurrentStatusDisplay("Operation completed");
 
+    }
+
+    protected void logRename(File oldFile, File newFile) {
+        this.renameLog.add(oldFile.getAbsolutePath().concat(" ====> ").concat(newFile.getAbsolutePath()));
+    }
+
+    protected String getCurrentOperationLogFileName()
+    {
+        SimpleDateFormat formatter = new SimpleDateFormat("yyyy-MM-dd-hh-mm-ss");
+        return this.path.concat(System.getProperty("file.separator"))
+            .concat(this.series.seriesTitle)
+            .concat("_")
+            .concat(formatter.format(Calendar.getInstance().getTime()))
+            .concat(".renamelog");
+
+    }
+
+    public void saveRenameLog() throws FileNotFoundException, UnsupportedEncodingException {
+        PrintWriter logfile = new PrintWriter(this.getCurrentOperationLogFileName(), "UTF-8");
+        for (String entry: this.renameLog) {
+            logfile.println(entry);
+        }
+        logfile.close();
+        this.renameLog = new ArrayList<String>();
     }
 
     public void updateSeriesTitle() {
@@ -153,7 +204,7 @@ public class Renamer {
         JFileChooser chooser = new JFileChooser();
         chooser.setDialogTitle("Select a directory");
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
-        chooser.setCurrentDirectory(new File("d:/Torrent"));
+        //chooser.setCurrentDirectory(new File("d:/Torrent"));
         JButton button = (JButton) e.getSource();
         MainForm frame = (MainForm) SwingUtilities.getRoot(button);
         if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
@@ -269,5 +320,30 @@ public class Renamer {
             }
         }
 
+    }
+
+    public void undoRenameFromLogfile(ActionEvent e) throws IOException {
+        this.setCurrentStatusDisplay("");
+        JFileChooser chooser = new JFileChooser();
+        chooser.setDialogTitle("Select a directory");
+        chooser.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        //chooser.setCurrentDirectory(new File("o:/sorozat/megnezve/sga_s4"));
+        JButton button = (JButton) e.getSource();
+        MainForm frame = (MainForm) SwingUtilities.getRoot(button);
+        if (chooser.showOpenDialog(frame) == JFileChooser.APPROVE_OPTION) {
+            this.renameLog = (ArrayList<String>) Files.readAllLines(chooser.getSelectedFile().toPath());
+            this.revertRenamesFromRenameLog();
+            chooser.getSelectedFile().delete();
+        }
+    }
+
+    protected void revertRenamesFromRenameLog() {
+        for (String entry: this.renameLog) {
+            String[] parts = entry.split("\\s\\=\\=\\=\\=\\>\\s");
+            File oldFile = new File(parts[0]);
+            File newFile = new File(parts[1]);
+            boolean result = newFile.renameTo(oldFile);
+        }
+        this.setCurrentStatusDisplay("Operation reverted, log file deleted");
     }
 }

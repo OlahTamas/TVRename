@@ -11,6 +11,7 @@ public class MainForm extends JFrame{
     private JLabel label1;
     private JLabel resultLabel;
     public JButton proceedButton;
+    public JButton revertButton;
     public JButton titleUpdateButton;
     private JPanel mainPanel;
     private JPanel optionsPanel;
@@ -75,10 +76,14 @@ public class MainForm extends JFrame{
         this.proceedButton.setText("Proceed");
         this.proceedButton.setEnabled(false);
         this.proceedButton.setSize(new Dimension(128, 32));
+        this.revertButton = new JButton();
+        this.revertButton.setText("Revert from logfile");
+        this.revertButton.setSize(new Dimension(128, 32));
 
         this.bottomPanel = new JPanel();
         this.bottomPanel.setPreferredSize(new Dimension(1000, 64));
         this.bottomPanel.add(proceedButton);
+        this.bottomPanel.add(revertButton);
         this.resultLabel = new JLabel();
         this.resultLabel.setPreferredSize(new Dimension(1000, 32));
         this.bottomPanel.add(this.resultLabel);
