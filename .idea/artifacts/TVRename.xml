@@ -1,0 +1,10 @@
+<component name="ArtifactManager">
+  <artifact name="TVRename">
+    <output-path>$PROJECT_DIR$/out/artifacts/TVRename</output-path>
+    <root id="root">
+      <element id="archive" name="TVRename.jar">
+        <element id="module-output" name="TVRename" />
+      </element>
+    </root>
+  </artifact>
+</component>

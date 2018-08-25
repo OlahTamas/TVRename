@@ -235,8 +235,12 @@ public class Renamer {
         DeepDirectoryParser parser = new DeepDirectoryParser(this.copySourcePath, this.getFilterExpression());
         try {
             parser.parseDirectoryForSubDirectories();
-            this.showSearchResults(parser.getResults());
-            this.directoriesToBeDeleted = parser.getResults();
+            for (String entry: parser.getResults()) {
+                if (!entry.matches(".*\\.trash.*")) {
+                    this.directoriesToBeDeleted.add(entry);
+                }
+            }
+            this.showSearchResults(this.directoriesToBeDeleted);
             ((MainForm) this.frame).moveEmptyDirectoriesButton.setEnabled(true);
         } catch (IOException e) {
             e.printStackTrace();
@@ -249,17 +253,19 @@ public class Renamer {
         File trashBase = new File(this.copySourcePath.concat(pathSeparator).concat(".trash"));
         trashBase.mkdirs();
         for (String entry: this.directoriesToBeDeleted) {
-            File sourceFile = new File(entry);
-            String sourceFileFullName = sourceFile.toString().replace(this.copySourcePath.concat(pathSeparator), "");
-            File destinationFile = new File(trashBase.toString().concat(pathSeparator).concat(sourceFileFullName));
-            try {
-                if (!sourceFile.renameTo(destinationFile)) {
-                    throw new IOException("Error");
+            if (!entry.contains(".trash")) {
+                File sourceFile = new File(entry);
+                String sourceFileFullName = sourceFile.toString().replace(this.copySourcePath.concat(pathSeparator), "");
+                File destinationFile = new File(trashBase.toString().concat(pathSeparator).concat(sourceFileFullName));
+                try {
+                    if (!sourceFile.renameTo(destinationFile)) {
+                        throw new IOException("Error");
+                    }
+                    //Files.move(sourceFile.toPath(), destinationFile.toPath());
+                } catch (IOException e) {
+                    ((MainForm) this.frame).copySearchResults.append("Error moving ".concat(sourceFile.getName()).concat(" to ").concat(destinationFile.getPath()));
+                    ((MainForm) this.frame).copySearchResults.append("\n");
                 }
-                //Files.move(sourceFile.toPath(), destinationFile.toPath());
-            } catch (IOException e) {
-                ((MainForm) this.frame).copySearchResults.append("Error moving ".concat(sourceFile.getName()).concat(" to ").concat(destinationFile.getPath()));
-                ((MainForm) this.frame).copySearchResults.append("\n");
             }
         }
 
