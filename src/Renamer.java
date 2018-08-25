@@ -14,9 +14,11 @@ public class Renamer {
     JFrame frame;
     Series series;
     ArrayList<String> filesToBeCopiedOrMoved;
+    ArrayList<String> directoriesToBeDeleted;
 
     public Renamer() {
         this.filesToBeCopiedOrMoved = new ArrayList<String>();
+        this.directoriesToBeDeleted = new ArrayList<String>();
         this.frame = new MainForm();
         ((MainForm) this.frame).button1.addActionListener(new ActionListener() {
             @Override
@@ -72,6 +74,22 @@ public class Renamer {
                 } catch (IOException e1) {
                     e1.printStackTrace();
                 }
+            }
+        });
+        ((MainForm) this.frame).moveEmptyDirectoriesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                try {
+                    moveEmptyDirectories();
+                } catch (IOException e1) {
+                    e1.printStackTrace();
+                }
+            }
+        });
+        ((MainForm) this.frame).scanEmptyDirectoriesButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                searchDirectoriesWithoutVideofiles();
             }
         });
 
@@ -211,5 +229,39 @@ public class Renamer {
                 ((MainForm) this.frame).copySearchResults.append("\n");
             }
         }
+    }
+
+    public void searchDirectoriesWithoutVideofiles() {
+        DeepDirectoryParser parser = new DeepDirectoryParser(this.copySourcePath, this.getFilterExpression());
+        try {
+            parser.parseDirectoryForSubDirectories();
+            this.showSearchResults(parser.getResults());
+            this.directoriesToBeDeleted = parser.getResults();
+            ((MainForm) this.frame).moveEmptyDirectoriesButton.setEnabled(true);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void moveEmptyDirectories() throws IOException {
+        String pathSeparator = System.getProperty("file.separator");
+        ((MainForm) this.frame).copySearchResults.setRows(0);
+        File trashBase = new File(this.copySourcePath.concat(pathSeparator).concat(".trash"));
+        trashBase.mkdirs();
+        for (String entry: this.directoriesToBeDeleted) {
+            File sourceFile = new File(entry);
+            String sourceFileFullName = sourceFile.toString().replace(this.copySourcePath.concat(pathSeparator), "");
+            File destinationFile = new File(trashBase.toString().concat(pathSeparator).concat(sourceFileFullName));
+            try {
+                if (!sourceFile.renameTo(destinationFile)) {
+                    throw new IOException("Error");
+                }
+                //Files.move(sourceFile.toPath(), destinationFile.toPath());
+            } catch (IOException e) {
+                ((MainForm) this.frame).copySearchResults.append("Error moving ".concat(sourceFile.getName()).concat(" to ").concat(destinationFile.getPath()));
+                ((MainForm) this.frame).copySearchResults.append("\n");
+            }
+        }
+
     }
 }

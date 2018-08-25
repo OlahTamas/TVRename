@@ -25,7 +25,16 @@ public class DeepDirectoryParser extends DirectoryParserBase {
                 this.results.add(entry);
             }
         }
-        int i=5;
+    }
+
+    public void parseDirectoryForSubDirectories() throws IOException {
+        Path startingPath = Paths.get(this.path);
+        DirectoryVisitor visitor = new DirectoryVisitor();
+        Files.walkFileTree(startingPath, visitor);
+        for (String entry: visitor.directories) {
+            this.results.add(entry);
+        }
+
     }
 
     public ArrayList<String> getResults() {

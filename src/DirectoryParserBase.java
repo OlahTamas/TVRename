@@ -11,7 +11,7 @@ public class DirectoryParserBase extends SimpleFileVisitor {
         return i > -1 ? filename.substring(i+1) : "";
     }
 
-    protected boolean isFileVideoFile(String filename) {
+    public boolean isFileVideoFile(String filename) {
         String extension = getFileExtension(filename);
         return this.videoFileExtensions.contains(extension);
     }

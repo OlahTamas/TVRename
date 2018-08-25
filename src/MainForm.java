@@ -31,6 +31,8 @@ public class MainForm extends JFrame{
     public JTextArea copySearchResults;
     public JButton copyButton;
     public JButton moveButton;
+    public JButton scanEmptyDirectoriesButton;
+    public JButton moveEmptyDirectoriesButton;
 
     public MainForm() {
         this.setTitle("TVRename");
@@ -146,8 +148,12 @@ public class MainForm extends JFrame{
 
         JPanel panel3 = new JPanel();
         this.copySearchResults = new JTextArea();
-        this.copySearchResults.setPreferredSize(new Dimension(950, 300));
-        panel3.add(this.copySearchResults);
+        //this.copySearchResults.setPreferredSize(new Dimension(950, 300));
+        JScrollPane scroll = new JScrollPane(this.copySearchResults);
+        scroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
+        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        scroll.setPreferredSize(new Dimension(950, 300));
+        panel3.add(scroll);
 
         JPanel panel4 = new JPanel();
 
@@ -176,11 +182,24 @@ public class MainForm extends JFrame{
         panel5.add(this.copyButton);
         panel5.add(this.moveButton);
 
+        JPanel panel6 = new JPanel();
+        panel5.setPreferredSize(new Dimension(1000, 64));
+        this.scanEmptyDirectoriesButton = new JButton();
+        this.scanEmptyDirectoriesButton.setText("Scan for directories without video files");
+        this.moveEmptyDirectoriesButton = new JButton();
+        this.moveEmptyDirectoriesButton.setText("Move empty directories to a .trash folder");
+        this.moveEmptyDirectoriesButton.setEnabled(false);
+
+        panel6.add(this.scanEmptyDirectoriesButton);
+        panel6.add(this.moveEmptyDirectoriesButton);
+
+
         this.copyTab.add(panel1);
         this.copyTab.add(panel2);
         this.copyTab.add(panel3);
         this.copyTab.add(panel4);
         this.copyTab.add(panel5);
+        this.copyTab.add(panel6);
     }
 
     public static void main(String[] args) {
