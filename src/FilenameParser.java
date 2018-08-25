@@ -4,14 +4,24 @@ import java.util.regex.Pattern;
 
 public class FilenameParser {
     String filename;
-    final String episodeIdentifierRegex = "(?i)(\\.|\\-|\\_|\\s)s{0,1}\\d{1,2}(e|x){0,1}\\d{1,2}(\\-e\\d{1,2}){0,1}(\\.|\\-|\\_|\\s)";
+    final String[] episodeIdentifierRegexes = {
+            "(?i)(\\.|\\-|\\_|\\s)s\\d{1,2}(e|x)\\d{1,2}(\\-e\\d{1,2}){0,1}(\\.|\\-|\\_|\\s)",
+            "(?i)(\\.|\\-|\\_|\\s)\\d{1,2}(e|x){0,1}\\d{1,2}(\\-e\\d{1,2}){0,1}(\\.|\\-|\\_|\\s)",
+            "(?i)(\\.|\\-|\\_|\\s)\\d{1,2}\\d{1,2}(\\-e\\d{1,2}){0,1}(\\.|\\-|\\_|\\s)",
+    };
 
     public FilenameParser(String filename) {
         this.filename = filename;
     }
 
     public String getEpisodeIdentifierString() {
-        return getFirstRegexMatchFromFilename(this.episodeIdentifierRegex);
+        for (int i = 0; i < episodeIdentifierRegexes.length; i++) {
+            String result = getFirstRegexMatchFromFilename(this.episodeIdentifierRegexes[i]);
+            if (result != null) {
+                return result;
+            }
+        }
+        return null;
     }
 
     public EpisodeIdentifier getEpisodeIdentifier()
