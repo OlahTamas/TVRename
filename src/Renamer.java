@@ -4,6 +4,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.*;
 import java.lang.reflect.Array;
+import java.net.MalformedURLException;
 import java.nio.file.Files;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -26,6 +27,7 @@ public class Renamer {
         this.directoriesToBeDeleted = new ArrayList<String>();
         this.renameLog = new ArrayList<String>();
         this.frame = new MainForm();
+        TVDBConnector tvdbConnector = new TVDBConnector();
         ((MainForm) this.frame).button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -114,6 +116,12 @@ public class Renamer {
                 }
             }
         });
+        try {
+            setCurrentStatusDisplay(tvdbConnector.authenticate());
+            setCurrentStatusDisplay(tvdbConnector.searchSeriesByName("Supernatural"));
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
 
     }
 

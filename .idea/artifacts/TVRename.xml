@@ -4,6 +4,7 @@
     <root id="root">
       <element id="archive" name="TVRename.jar">
         <element id="module-output" name="TVRename" />
+        <element id="extracted-dir" path="$MAVEN_REPOSITORY$/org/json/json/20180813/json-20180813.jar" path-in-jar="/" />
       </element>
     </root>
   </artifact>
