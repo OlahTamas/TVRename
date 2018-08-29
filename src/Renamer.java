@@ -27,7 +27,6 @@ public class Renamer {
         this.directoriesToBeDeleted = new ArrayList<String>();
         this.renameLog = new ArrayList<String>();
         this.frame = new MainForm();
-        TVDBConnector tvdbConnector = new TVDBConnector();
         ((MainForm) this.frame).button1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -116,12 +115,13 @@ public class Renamer {
                 }
             }
         });
-        try {
-            setCurrentStatusDisplay(tvdbConnector.authenticate());
-            setCurrentStatusDisplay(tvdbConnector.searchSeriesByName("Supernatural"));
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        }
+//        TVDBConnector tvdbConnector = new TVDBConnector();
+//        try {
+//            setCurrentStatusDisplay(tvdbConnector.authenticate());
+//            setCurrentStatusDisplay(tvdbConnector.searchSeriesByName("Supernatural"));
+//        } catch (MalformedURLException e) {
+//            e.printStackTrace();
+//        }
 
     }
 

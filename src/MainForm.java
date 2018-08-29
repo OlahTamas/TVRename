@@ -41,7 +41,7 @@ public class MainForm extends JFrame{
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         this.setSize(new Dimension(1024, 720));
         this.mainTabbedPanel = new JTabbedPane();
-        this.mainTabbedPanel.setPreferredSize(new Dimension(1020, 716));
+        this.mainTabbedPanel.setPreferredSize(new Dimension(1020, 700));
         this.renameTab = new JPanel();
         this.copyTab = new JPanel();
         this.mainTabbedPanel.addTab("Rename", this.renameTab);
@@ -54,6 +54,11 @@ public class MainForm extends JFrame{
         this.addBottomPanel(this.renameTab);
 
         this.addMainCopyPanel(this.copyTab);
+//        JLabel thanksLabel = new JLabel();
+//        thanksLabel.setText("THX to nagyivo for the high-volume beta testing");
+//        thanksLabel.setPreferredSize(new Dimension(1000, 20));
+//        thanksLabel.setHorizontalAlignment(JLabel.RIGHT);
+//        this.add(thanksLabel);
 
         this.setLayout(new FlowLayout());
         this.setVisible(true);
